@@ -81,10 +81,10 @@ rearRightWheelBody.position.set(-1, 0, -1.5);
 const loader = new GLTFLoader();
 let carModel;
 loader.load(
-  'path/to/car-model.gltf',
+  'https://sketchfab.com/models/6a8f7c1653c745aba3b1ece27c0537ed',
   (gltf) => {
     carModel = gltf.scene;
-    carModel.scale.set(0.5, 0.5, 0.5);
+    carModel.scale.set(0.2, 0.2, 0.2);
     scene.add(carModel);
   },
   (progress) => {
