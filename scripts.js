@@ -1,11 +1,10 @@
 // scripts.js
 
 // Import necessary libraries
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import * as CANNON from 'cannon-es';
-import CannonDebugger from 'cannon-es-debugger';
-import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js';
+import * as THREE from 'https://cdn.skypack.dev/three@0.137.0';
+import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.137.0/examples/jsm/loaders/GLTFLoader.js';
+import * as CANNON from 'https://cdn.skypack.dev/cannon-es@0.18.0';
+import { PointerLockControls } from 'https://cdn.skypack.dev/three@0.137.0/examples/jsm/controls/PointerLockControls.js';
 
 // Set up the scene, camera, and renderer
 const scene = new THREE.Scene();
@@ -25,13 +24,15 @@ const carBody = new CANNON.Body({
 });
 world.addBody(carBody);
 
-// Load the car model
+// Load the car model from Sketchfab
 const loader = new GLTFLoader();
 let carModel;
-loader.load('path/to/car/model.gltf', (gltf) => {
+loader.load('https://sketchfab.com/models/6a8f7c1653c745aba3b1ece27c0537ed/embed', (gltf) => {
   carModel = gltf.scene;
   carModel.scale.set(0.5, 0.5, 0.5);
   scene.add(carModel);
+}, undefined, (error) => {
+  console.error('Error loading car model:', error);
 });
 
 // Set up the camera controls
