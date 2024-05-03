@@ -5,7 +5,6 @@ import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/l
 import { DRACOLoader } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/DRACOLoader.js';
 import * as CANNON from 'https://cdn.skypack.dev/cannon-es@0.18.0';
 import { PointerLockControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/PointerLockControls.js';
-import { Sky } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/objects/Sky.js';
 import { Water } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/objects/Water.js';
 
 // Set up the scene, camera, and renderer
@@ -155,7 +154,7 @@ function animate() {
   // Update the camera position and rotation
   camera.position.copy(controls.getObject().position);
   camera.quaternion.copy(controls.getObject().quaternion);
-
+  
   // Update the water material
   waterMaterial.uniforms.time.value += 1.0 / 60.0;
 
@@ -163,5 +162,13 @@ function animate() {
   renderer.render(scene, camera);
 }
 
+// Start the experience when the start button is clicked
+function startExperience() {
+  const blocker = document.getElementById('blocker');
+  blocker.style.display = 'none';
+
 // Start the animation loop
 animate();
+
+  // Attach the startExperience function to the start button
+document.getElementById('startButton').addEventListener('click', startExperience);
