@@ -9,11 +9,50 @@
 <body>
   <div id="blocker">
     <div id="instructions">
-      <p>Click to start</p>
-      <p>Move: WASD<br/>Look: MOUSE</p>
+      <h1>3D Car Website</h1>
+      <p>Click to start the experience.</p>
+      <p>Use the following controls:</p>
+      <ul>
+        <li>Move: WASD keys</li>
+        <li>Look: Mouse</li>
+        <li>Brake: Space</li>
+      </ul>
+      <button id="startButton">Start</button>
     </div>
   </div>
 
+  <div id="loading">
+    <div id="loadingBar"></div>
+    <div id="loadingText">Loading...</div>
+  </div>
+
+  <div id="hud">
+    <div id="speedometer">
+      <div id="speedometerValue">0</div>
+      <div id="speedometerUnit">km/h</div>
+    </div>
+    <div id="minimap"></div>
+  </div>
+
+  <div id="menu">
+    <h2>Settings</h2>
+    <div>
+      <label for="volumeSlider">Volume:</label>
+      <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
+    </div>
+    <div>
+      <label for="qualitySelect">Graphics Quality:</label>
+      <select id="qualitySelect">
+        <option value="low">Low</option>
+        <option value="medium" selected>Medium</option>
+        <option value="high">High</option>
+      </select>
+    </div>
+    <button id="resetButton">Reset Car Position</button>
+  </div>
+
+  <script src="https://cdn.skypack.dev/three@0.129.0"></script>
+  <script src="https://cdn.skypack.dev/cannon-es@0.18.0"></script>
   <script type="module" src="scripts.js"></script>
 </body>
 </html>
