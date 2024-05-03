@@ -3,6 +3,7 @@
 body {
   margin: 0;
   overflow: hidden;
+  font-family: Arial, sans-serif;
 }
 
 #blocker {
@@ -13,6 +14,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 100;
 }
 
 #instructions {
@@ -23,10 +25,165 @@ body {
   justify-content: center;
   align-items: center;
   text-align: center;
-  font-size: 24px;
   color: #ffffff;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+#instructions h1 {
+  font-size: 48px;
+  margin-bottom: 20px;
 }
 
 #instructions p {
-  margin: 10px 0;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+#instructions ul {
+  list-style-type: none;
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+#instructions li {
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+#startButton {
+  padding: 10px 20px;
+  font-size: 24px;
+  background-color: #4CAF50;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#startButton:hover {
+  background-color: #45a049;
+}
+
+#loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 999;
+}
+
+#loadingBar {
+  width: 200px;
+  height: 20px;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+#loadingBar::after {
+  content: '';
+  display: block;
+  width: 0;
+  height: 100%;
+  background-color: #4CAF50;
+  animation: loading 2s linear infinite;
+}
+
+@keyframes loading {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+#loadingText {
+  font-size: 18px;
+  color: #ffffff;
+}
+
+#hud {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  z-index: 10;
+}
+
+#speedometer {
+  display: flex;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  border-radius: 5px;
+  color: #ffffff;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+#speedometerValue {
+  margin-right: 5px;
+}
+
+#minimap {
+  width: 200px;
+  height: 200px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 5px;
+}
+
+#menu {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  border-radius: 5px;
+  color: #ffffff;
+  z-index: 10;
+}
+
+#menu h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+#menu div {
+  margin-bottom: 10px;
+}
+
+#menu label {
+  font-size: 18px;
+  margin-right: 10px;
+}
+
+#volumeSlider {
+  width: 100px;
+}
+
+#qualitySelect {
+  padding: 5px;
+  font-size: 16px;
+}
+
+#resetButton {
+  padding: 10px 20px;
+  font-size: 18px;
+  background-color: #f44336;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#resetButton:hover {
+  background-color: #d32f2f;
 }
