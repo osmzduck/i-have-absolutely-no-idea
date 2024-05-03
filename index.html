@@ -1,37 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Driving Adventure</title>
-    <link rel="stylesheet" href="styles.css">
-    <script type="module" src="https://unpkg.com/three/build/three.min.js"></script>
-    <script type="module" src="https://unpkg.com/cannon-es"></script>
-    <script type="module" src="https://unpkg.com/three/examples/jsm/controls/PointerLockControls.js"></script>
-    <script type="module" src="scripts.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Immersive 3D Website Experience</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="container">
-        <div id="info">
-            <p>Use WASD to move, mouse to look around</p>
-        </div>
-        <div id="hud">
-            <div id="speedometer" class="hud-item">Speed: 0 km/h</div>
-            <div id="gear-indicator" class="hud-item">Gear: N</div>
-        </div>
-        <canvas id="webgl-output"></canvas>
-    </div>
-    <script>
-        // Additional inline scripts can be used for quick tests or fixes
-        window.addEventListener('load', () => {
-            const blocker = document.getElementById('blocker');
-            const instructions = document.getElementById('instructions');
+  <div id="loading-screen">
+    <div class="loading-text">Loading...</div>
+    <div class="progress-bar"></div>
+  </div>
 
-            instructions.addEventListener('click', () => {
-                instructions.style.display = 'none';
-                blocker.style.display = 'none';
-            });
-        });
-    </script>
+  <div id="blocker">
+    <div id="instructions">
+      <p>Click to start the experience</p>
+      <p>Use WASD keys to drive the car</p>
+      <p>Explore the virtual environment</p>
+    </div>
+  </div>
+
+  <div id="mini-map"></div>
+
+  <div id="container"></div>
+
+  <script type="module" src="scripts.js"></script>
 </body>
 </html>
