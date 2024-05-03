@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js';
 import { Water } from 'three/examples/jsm/objects/Water.js';
 import * as CANNON from 'cannon-es';
@@ -10,11 +9,54 @@ let acceleration = 0;
 let steering = 0;
 let isMobile = false;
 
-const loader = new GLTFLoader();
 const clock = new THREE.Clock();
 
 init();
 animate();
+
+function createCarModel() {
+  const car = new THREE.Group();
+
+  // Create the car body
+  const bodyGeometry = new THREE.BoxGeometry(2, 1, 4);
+  const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000 });
+  const bodyMesh = new THREE.Mesh(bodyGeometry, bodyMaterial);
+  bodyMesh.position.set(0, 0.5, 0);
+  car.add(bodyMesh);
+
+  // Create the front wheels
+  const wheelGeometry = new THREE.CylinderGeometry(0.5, 0.5, 0.2, 32);
+  const wheelMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 });
+  const frontLeftWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+  frontLeftWheel.position.set(-1, 0, 1.5);
+  frontLeftWheel.rotation.z = Math.PI / 2;
+  car.add(frontLeftWheel);
+
+  const frontRightWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+  frontRightWheel.position.set(1, 0, 1.5);
+  frontRightWheel.rotation.z = Math.PI / 2;
+  car.add(frontRightWheel);
+
+  // Create the rear wheels
+  const rearLeftWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+  rearLeftWheel.position.set(-1, 0, -1.5);
+  rearLeftWheel.rotation.z = Math.PI / 2;
+  car.add(rearLeftWheel);
+
+  const rearRightWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+  rearRightWheel.position.set(1, 0, -1.5);
+  rearRightWheel.rotation.z = Math.PI / 2;
+  car.add(rearRightWheel);
+
+  // Create the windshield
+  const windshieldGeometry = new THREE.BoxGeometry(2, 0.5, 1);
+  const windshieldMaterial = new THREE.MeshPhongMaterial({ color: 0x00ffff, transparent: true, opacity: 0.5 });
+  const windshieldMesh = new THREE.Mesh(windshieldGeometry, windshieldMaterial);
+  windshieldMesh.position.set(0, 1, 0.5);
+  car.add(windshieldMesh);
+
+  return car;
+}
 
 function init() {
   // Set up the scene
@@ -52,13 +94,11 @@ function init() {
   dirLight.shadow.camera.bottom = - 2;
   scene.add(dirLight);
 
-  // Load the car model
-  loader.load('sportcar.017.glb', (gltf) => {
-    carModel = gltf.scene;
-    carModel.scale.set(0.5, 0.5, 0.5);
-    carModel.position.y = 0.5;
-    scene.add(carModel);
-  });
+  // Create the car model
+  carModel = createCarModel();
+  carModel.scale.set(0.5, 0.5, 0.5);
+  carModel.position.y = 0.5;
+  scene.add(carModel);
 
   // Set up the physics world
   physicsWorld = new CANNON.World();
