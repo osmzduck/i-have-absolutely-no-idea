@@ -35,13 +35,12 @@ const loader = new GLTFLoader();
 const dracoLoader = new DRACOLoader();
 dracoLoader.setDecoderPath('https://cdn.skypack.dev/three@0.129.0/examples/js/libs/draco/');
 loader.setDRACOLoader(dracoLoader);
-loader.load('https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/ToyCar/glTF-Binary/ToyCar.glb', (gltf) => {
+loader.load('sportcar.017.glb', (gltf) => {
   car = gltf.scene;
-  car.scale.set(10, 10, 10);
+  car.scale.set(0.5, 0.5, 0.5);
   car.position.y = 1;
   scene.add(car);
 });
-
 // Set up the camera controls
 const controls = new PointerLockControls(camera, renderer.domElement);
 scene.add(controls.getObject());
