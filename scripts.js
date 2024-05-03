@@ -11,14 +11,14 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// Load the sport car 3D model
+// Load the sport car model
 const loader = new GLTFLoader();
-let car;
+let carModel;
 loader.load('sportcar.017.glb', (gltf) => {
-  car = gltf.scene;
-  car.scale.set(0.5, 0.5, 0.5);
-  car.position.set(0, 0.5, 0);
-  scene.add(car);
+  carModel = gltf.scene;
+  carModel.scale.set(0.5, 0.5, 0.5);
+  carModel.position.set(0, 0, 0);
+  scene.add(carModel);
 });
 
 // Create the environment
@@ -33,7 +33,7 @@ const skyMaterial = new THREE.ShaderMaterial({
     void main() {
       vec4 worldPosition = modelMatrix * vec4(position, 1.0);
       vWorldPosition = worldPosition.xyz;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      gl_Position = projectionMatrix * viewMatrix * worldPosition;
     }
   `,
   fragmentShader: `
@@ -70,7 +70,7 @@ const terrainGeometry = new THREE.PlaneGeometry(1000, 1000);
 const terrainMaterial = new THREE.MeshStandardMaterial({ color: 0x9c7653 });
 const terrain = new THREE.Mesh(terrainGeometry, terrainMaterial);
 terrain.rotation.x = -Math.PI / 2;
-terrain.position.y = -0.5;
+terrain.position.y = -1;
 scene.add(terrain);
 
 // Set up lighting
@@ -78,12 +78,12 @@ const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
 scene.add(ambientLight);
 
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-directionalLight.position.set(0, 10, 0);
+directionalLight.position.set(100, 100, 100);
 directionalLight.castShadow = true;
 directionalLight.shadow.mapSize.width = 2048;
 directionalLight.shadow.mapSize.height = 2048;
 directionalLight.shadow.camera.near = 1;
-directionalLight.shadow.camera.far = 20;
+directionalLight.shadow.camera.far = 500;
 scene.add(directionalLight);
 
 // Set up camera and controls
@@ -95,110 +95,104 @@ scene.add(controls.getObject());
 const world = new CANNON.World();
 world.gravity.set(0, -9.82, 0);
 
-const carShape = new CANNON.Box(new CANNON.Vec3(0.75, 0.3, 1.5));
+const carBodyShape = new CANNON.Box(new CANNON.Vec3(1, 0.5, 2));
+const carBodyMaterial = new CANNON.Material();
 const carBody = new CANNON.Body({
-  mass: 150,
-  shape: carShape,
+  mass: 1000,
+  material: carBodyMaterial,
+  shape: carBodyShape,
 });
-carBody.position.set(0, 0.5, 0);
 world.addBody(carBody);
 
-const groundShape = new CANNON.Plane();
-const groundBody = new CANNON.Body({
-  mass: 0,
-  shape: groundShape,
-});
-groundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
-world.addBody(groundBody);
+const wheelMaterial = new CANNON.Material();
+const wheelShape = new CANNON.Sphere(0.4);
+const wheelBodies = [];
+const wheelPositions = [
+  new CANNON.Vec3(1, 0, 1.5),
+  new CANNON.Vec3(-1, 0, 1.5),
+  new CANNON.Vec3(1, 0, -1.5),
+  new CANNON.Vec3(-1, 0, -1.5),
+];
+for (let i = 0; i < 4; i++) {
+  const wheelBody = new CANNON.Body({
+    mass: 10,
+    material: wheelMaterial,
+    shape: wheelShape,
+  });
+  wheelBody.position.copy(wheelPositions[i]);
+  wheelBodies.push(wheelBody);
+  world.addBody(wheelBody);
+}
 
 // Set up car controls
 const maxSteerVal = 0.5;
-const maxForce = 500;
-const brakeForce = 1000;
+const maxForce = 1000;
+const brakeForce = 1000000;
+const wheelConstraints = [];
+for (let i = 0; i < 4; i++) {
+  const wheelConstraint = new CANNON.HingeConstraint(carBody, wheelBodies[i], {
+    pivotA: wheelPositions[i],
+    axisA: new CANNON.Vec3(0, 1, 0),
+    maxForce: maxForce,
+  });
+  wheelConstraints.push(wheelConstraint);
+  world.addConstraint(wheelConstraint);
+}
 
-const wheelGeometry = new THREE.CylinderGeometry(0.3, 0.3, 0.2, 24);
-const wheelMaterial = new THREE.MeshPhongMaterial({ color: 0x333333 });
+const accelerate = (force) => {
+  wheelBodies.forEach((wheelBody) => {
+    wheelBody.applyLocalForce(new CANNON.Vec3(0, 0, -force), new CANNON.Vec3(0, 0, 0));
+  });
+};
 
-const frontLeftWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
-frontLeftWheel.position.set(-0.7, 0.3, 1.2);
-frontLeftWheel.rotation.z = Math.PI / 2;
-car.add(frontLeftWheel);
+const brake = (force) => {
+  wheelBodies.forEach((wheelBody) => {
+    wheelBody.applyLocalForce(new CANNON.Vec3(0, 0, force), new CANNON.Vec3(0, 0, 0));
+  });
+};
 
-const frontRightWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
-frontRightWheel.position.set(0.7, 0.3, 1.2);
-frontRightWheel.rotation.z = Math.PI / 2;
-car.add(frontRightWheel);
+const steer = (angle) => {
+  wheelConstraints[0].axisA.z = angle;
+  wheelConstraints[1].axisA.z = angle;
+};
 
-const backLeftWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
-backLeftWheel.position.set(-0.7, 0.3, -1.2);
-backLeftWheel.rotation.z = Math.PI / 2;
-car.add(backLeftWheel);
-
-const backRightWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
-backRightWheel.position.set(0.7, 0.3, -1.2);
-backRightWheel.rotation.z = Math.PI / 2;
-car.add(backRightWheel);
-
-let steeringValue = 0;
-let engineForce = 0;
-let isBreaking = false;
-
+// Set up keyboard controls
+const keysPressed = {};
 document.addEventListener('keydown', (event) => {
-  switch (event.code) {
-    case 'ArrowUp':
-      engineForce = maxForce;
-      break;
-    case 'ArrowDown':
-      engineForce = -maxForce;
-      break;
-    case 'ArrowLeft':
-      steeringValue = maxSteerVal;
-      break;
-    case 'ArrowRight':
-      steeringValue = -maxSteerVal;
-      break;
-    case 'Space':
-      isBreaking = true;
-      break;
-  }
+  keysPressed[event.code] = true;
 });
-
 document.addEventListener('keyup', (event) => {
-  switch (event.code) {
-    case 'ArrowUp':
-    case 'ArrowDown':
-      engineForce = 0;
-      break;
-    case 'ArrowLeft':
-    case 'ArrowRight':
-      steeringValue = 0;
-      break;
-    case 'Space':
-      isBreaking = false;
-      break;
-  }
+  keysPressed[event.code] = false;
 });
 
-// Animation loop
+// Update physics and render the scene
+const clock = new THREE.Clock();
+let delta;
 const animate = () => {
   requestAnimationFrame(animate);
+  delta = clock.getDelta();
+  world.step(delta);
 
-  // Update physics
-  world.step(1 / 60);
-  car.position.copy(carBody.position);
-  car.quaternion.copy(carBody.quaternion);
-
-  // Apply car controls
-  frontLeftWheel.rotation.y = steeringValue;
-  frontRightWheel.rotation.y = steeringValue;
-
-  if (isBreaking) {
-    carBody.applyLocalForce(new CANNON.Vec3(0, 0, brakeForce), new CANNON.Vec3(0, 0, 0));
-  } else {
-    carBody.applyLocalForce(new CANNON.Vec3(0, 0, engineForce), new CANNON.Vec3(0, 0, 0));
+  if (carModel) {
+    carModel.position.copy(carBody.position);
+    carModel.quaternion.copy(carBody.quaternion);
   }
 
-  // Render the scene
+  // Update car controls based on user input
+  if (keysPressed['KeyW']) {
+    accelerate(maxForce);
+  }
+  if (keysPressed['KeyS']) {
+    brake(brakeForce);
+  }
+  if (keysPressed['KeyA']) {
+    steer(maxSteerVal);
+  }
+  if (keysPressed['KeyD']) {
+    steer(-maxSteerVal);
+  }
+
+  water.material.uniforms['time'].value += delta;
   renderer.render(scene, camera);
 };
 
