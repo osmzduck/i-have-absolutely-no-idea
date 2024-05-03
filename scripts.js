@@ -46,7 +46,6 @@ const wheelBodies = [];
 const wheelVisuals = [];
 
 const wheelMaterial = new CANNON.Material('wheelMaterial');
-const floorMaterial = new CANNON.Material('floorMaterial');
 const wheelGroundContactMaterial = new CANNON.ContactMaterial(wheelMaterial, floorMaterial, {
   friction: 0.3,
   restitution: 0,
@@ -109,7 +108,7 @@ floorMesh.rotation.x = -Math.PI / 2;
 scene.add(floorMesh);
 
 const floorShape = new CANNON.Plane();
-const floorBody = new CANNON.Body({ mass: 0, material: floorMaterial });
+const floorBody = new CANNON.Body({ mass: 0 });
 floorBody.addShape(floorShape);
 floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
 world.addBody(floorBody);
