@@ -8,40 +8,27 @@
 </head>
 <body>
   <div id="loading-screen">
-    <div class="progress-bar-container">
-      <div id="progress-bar"></div>
+    <div>
+      Loading...
+      <div id="loading-progress">
+        <div id="loading-bar"></div>
+      </div>
     </div>
-    <div id="loading-text">Loading...</div>
   </div>
 
-  <div id="start-screen" style="display: none;">
-    <h1>3D Car Website</h1>
-    <p>Welcome to the 3D Car Website! Click the start button to begin the experience.</p>
-    <button id="start-button">Start</button>
-  </div>
-
-  <div id="hud" style="display: none;">
+  <div id="hud">
     <div id="speed">Speed: <span id="speed-value">0</span> km/h</div>
     <div id="minimap"></div>
   </div>
 
-  <div id="menu" style="display: none;">
-    <h2>Menu</h2>
-    <div>
-      <label for="volume">Volume:</label>
-      <input type="range" id="volume" min="0" max="1" step="0.1" value="1">
-    </div>
-    <div>
-      <label for="quality">Graphics Quality:</label>
-      <select id="quality">
-        <option value="low">Low</option>
-        <option value="medium" selected>Medium</option>
-        <option value="high">High</option>
-      </select>
-    </div>
-    <button id="reset-button">Reset Car Position</button>
+  <div id="menu">
+    <ul>
+      <li id="volume-toggle">Toggle Volume</li>
+      <li id="quality-toggle">Toggle Quality</li>
+      <li id="reset-car">Reset Car Position</li>
+    </ul>
   </div>
 
-  <script src="scripts.js" type="module"></script>
+  <script src="scripts.js"></script>
 </body>
 </html>
