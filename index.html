@@ -7,52 +7,50 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div id="blocker">
-    <div id="instructions">
-      <h1>3D Car Website</h1>
-      <p>Click to start the experience.</p>
-      <p>Use the following controls:</p>
-      <ul>
-        <li>Move: WASD keys</li>
-        <li>Look: Mouse</li>
-        <li>Brake: Space</li>
-      </ul>
-      <button id="startButton">Start</button>
-    </div>
+  <div id="loading-screen">
+    <div class="loading-text">Loading...</div>
+    <div class="progress-bar"></div>
   </div>
 
-  <div id="loading">
-    <div id="loadingBar"></div>
-    <div id="loadingText">Loading...</div>
+  <div id="start-screen">
+    <h1>Welcome to the 3D Car Experience</h1>
+    <p>Instructions:</p>
+    <ul>
+      <li>Use the arrow keys to control the car</li>
+      <li>Press the spacebar to brake</li>
+      <li>Explore the realistic environment</li>
+    </ul>
+    <button id="start-button">Start</button>
   </div>
 
   <div id="hud">
-    <div id="speedometer">
-      <div id="speedometerValue">0</div>
-      <div id="speedometerUnit">km/h</div>
-    </div>
+    <div id="speed">Speed: <span id="speed-value">0</span> km/h</div>
     <div id="minimap"></div>
   </div>
 
   <div id="menu">
+    <button id="resume-button">Resume</button>
+    <button id="settings-button">Settings</button>
+    <button id="reset-button">Reset Car Position</button>
+  </div>
+
+  <div id="settings-menu">
     <h2>Settings</h2>
     <div>
-      <label for="volumeSlider">Volume:</label>
-      <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
+      <label for="volume">Volume:</label>
+      <input type="range" id="volume" min="0" max="1" step="0.1" value="1">
     </div>
     <div>
-      <label for="qualitySelect">Graphics Quality:</label>
-      <select id="qualitySelect">
+      <label for="quality">Graphics Quality:</label>
+      <select id="quality">
         <option value="low">Low</option>
         <option value="medium" selected>Medium</option>
         <option value="high">High</option>
       </select>
     </div>
-    <button id="resetButton">Reset Car Position</button>
+    <button id="back-button">Back</button>
   </div>
 
-  <script src="https://cdn.skypack.dev/three@0.129.0"></script>
-  <script src="https://cdn.skypack.dev/cannon-es@0.18.0"></script>
-  <script type="module" src="scripts.js"></script>
+  <script src="scripts.js" type="module"></script>
 </body>
 </html>
