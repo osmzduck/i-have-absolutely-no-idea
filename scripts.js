@@ -77,10 +77,10 @@ wheelBodies[1].position.set(-1, 0.5, 1.5);
 wheelBodies[2].position.set(1, 0.5, -1.5);
 wheelBodies[3].position.set(-1, 0.5, -1.5);
 
-// Load the car model
+// Load the car model from Sketchfab
 const loader = new GLTFLoader();
 let carModel;
-loader.load('path/to/car-model.glb', (gltf) => {
+loader.load('https://sketchfab.com/models/6a8f7c1653c745aba3b1ece27c0537ed/embed', (gltf) => {
   carModel = gltf.scene;
   carModel.scale.set(0.5, 0.5, 0.5);
   carModel.position.y = 0.5;
@@ -156,7 +156,7 @@ const waterGeometry = new THREE.PlaneGeometry(10000, 10000);
 const water = new Water(waterGeometry, {
   textureWidth: 512,
   textureHeight: 512,
-  waterNormals: new THREE.TextureLoader().load('path/to/waternormals.jpg', (texture) => {
+  waterNormals: new THREE.TextureLoader().load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/waternormals.jpg', (texture) => {
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
   }),
   sunDirection: new THREE.Vector3(),
