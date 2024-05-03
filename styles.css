@@ -1,137 +1,123 @@
-body {
+/* styles.css */
+
+/* Reset default margin and padding */
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
   overflow: hidden;
   font-family: Arial, sans-serif;
+  background-color: #000;
+  color: #fff;
 }
 
-#blocker {
+/* Header styles */
+header {
   position: absolute;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-}
-
-#instructions {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-#instructions span {
-  color: #ffffff;
-  font-size: 36px;
-  margin-bottom: 20px;
-}
-
-#instructions p {
-  color: #ffffff;
-  margin-bottom: 10px;
-}
-
-.mini-map {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 200px;
-  height: 200px;
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 50%;
-  overflow: hidden;
-}
-
-.mini-map canvas {
-  width: 100%;
-  height: 100%;
-}
-
-.info-panel {
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
-  background-color: rgba(0, 0, 0, 0.7);
-  color: #ffffff;
-  padding: 10px;
-  font-size: 14px;
-  border-radius: 5px;
-}
-
-.info-panel p {
-  margin: 0;
-}
-
-.info-panel span {
-  font-weight: bold;
-}
-
-.controls {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.controls button {
-  background-color: #ffffff;
-  color: #000000;
-  border: none;
-  padding: 10px 20px;
-  font-size: 16px;
-  margin-bottom: 10px;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-.controls button:hover {
-  background-color: #f0f0f0;
-}
-
-.controls button:active {
-  background-color: #e0e0e0;
-}
-
-.loading-screen {
-  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
-  background-color: #000000;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 100;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  z-index: 9999;
-  transition: opacity 0.5s;
 }
 
-.loading-screen.fade-out {
-  opacity: 0;
-}
-
-.loading-text {
-  color: #ffffff;
+h1 {
   font-size: 24px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
-.progress-bar {
-  width: 200px;
-  height: 20px;
-  background-color: #ffffff;
-  border-radius: 10px;
+/* Navigation styles */
+nav ul {
+  list-style: none;
+  display: flex;
+}
+
+nav ul li {
+  margin-left: 20px;
+}
+
+nav ul li a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 16px;
+  transition: color 0.3s ease;
+}
+
+nav ul li a:hover {
+  color: #ff9800;
+}
+
+/* Info box styles */
+#info {
+  position: absolute;
+  top: 100px;
+  left: 20px;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 20px;
+  max-width: 300px;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+}
+
+#info:hover {
+  transform: translateY(-5px);
+}
+
+#info p {
   margin-top: 10px;
-  overflow: hidden;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
-.progress {
-  width: 0;
-  height: 100%;
-  background-color: #00ff00;
-  transition: width 0.5s;
+/* Mini-map styles */
+#mini-map {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 200px;
+  height: 200px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive styles */
+@media screen and (max-width: 768px) {
+  h1 {
+    font-size: 20px;
+  }
+
+  nav ul li {
+    margin-left: 10px;
+  }
+
+  nav ul li a {
+    font-size: 14px;
+  }
+
+  #info {
+    max-width: 200px;
+    padding: 10px;
+  }
+
+  #info p {
+    font-size: 12px;
+  }
+
+  #mini-map {
+    width: 150px;
+    height: 150px;
+  }
 }
