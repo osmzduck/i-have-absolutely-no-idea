@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Car Experience</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="scripts.js"></script>
+</head>
+<body>
+    <div id="info">
+        <div id="instructions">
+            <span style="font-size:24px">Click to play</span>
+            <br><br>
+            Use WASD to move, SPACE to jump, MOUSE to look around.
+        </div>
+        <div id="hud">
+            <div id="speed">Speed: 0 km/h</div>
+            <div id="minimap">Minimap: Not implemented</div>
+        </div>
+    </div>
+    <script>
+        // Example of potential inline script for handling additional UI elements or interactions
+        document.body.onclick = function() {
+            document.getElementById('instructions').style.display = 'none';
+        };
+    </script>
+</body>
+</html>
