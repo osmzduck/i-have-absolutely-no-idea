@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>3D Car Website</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="scripts.js">
+
   <style>
     body {
       margin: 0;
@@ -109,7 +112,7 @@
     const loader = new GLTFLoader();
     let carModel;
     loader.load(
-      'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/ferrari.glb',
+      'https://sketchfab.com/models/6a8f7c1653c745aba3b1ece27c0537ed/embed',
       (gltf) => {
         carModel = gltf.scene;
         carModel.scale.set(0.5, 0.5, 0.5);
