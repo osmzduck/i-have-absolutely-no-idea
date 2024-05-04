@@ -9,8 +9,38 @@
 <body>
     <div id="game-container">
         <canvas id="game-canvas"></canvas>
+        <div id="game-overlay">
+            <div id="level-info">Level: <span id="current-level">1</span></div>
+            <div id="timer">Time: <span id="time-remaining">60</span>s</div>
+            <div id="score">Score: <span id="current-score">0</span></div>
+        </div>
+        <div id="game-menu" class="hidden">
+            <h1>2D World Navigation</h1>
+            <button id="start-button">Start Game</button>
+            <button id="instructions-button">Instructions</button>
+        </div>
+        <div id="instructions-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Instructions</h2>
+                <p>Navigate the 2D world using the arrow keys or WASD keys to move the ball. Reach the goal in each level to progress. Collect coins to increase your score and avoid obstacles. Beat the timer to earn bonus points!</p>
+                <button id="close-instructions">Close</button>
+            </div>
+        </div>
+        <div id="level-complete-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Level Complete!</h2>
+                <p>Congratulations! You completed the level.</p>
+                <button id="next-level-button">Next Level</button>
+            </div>
+        </div>
+        <div id="game-over-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Game Over!</h2>
+                <p>Your final score: <span id="final-score"></span></p>
+                <button id="restart-button">Restart Game</button>
+            </div>
+        </div>
     </div>
-
     <script src="game.js"></script>
 </body>
 </html>
