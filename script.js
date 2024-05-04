@@ -1,97 +1,146 @@
-// Get the game container element
-const gameContainer = document.getElementById("game-container");
+// Canvas setup
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-// Create the game world
-const world = {
-    width: 800,
-    height: 600,
-    tiles: [],
-    ball: {}
+// Game variables
+let animationFrameId;
+const gravity = 0.5;
+const friction = 0.98;
+let obstacles = [];
+let gameSpeed = 4;
+const keys = {
+    right: false,
+    left: false,
+    up: false
 };
 
-// Create the ball
-world.ball = {
-    x: world.width / 2,
-    y: world.height / 2,
-    radius: 15,
-    velocityX: 0,
-    velocityY: 0,
-    accelerationX: 0,
-    accelerationY: 0,
-    mass: 1
-};
-
-// Create the map
-const map = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-map.setAttribute("viewBox", `0 0 ${world.width} ${world.height}`);
-map.setAttribute("preserveAspectRatio", "xMinYMin meet");
-gameContainer.appendChild(map);
-
-// Add map tiles
-for (let i = 0; i < 10; i++) {
-    for (let j = 0; j < 10; j++) {
-        const tile = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        tile.setAttribute("x", i * 80);
-        tile.setAttribute("y", j * 80);
-        tile.setAttribute("width", 80);
-        tile.setAttribute("height", 80);
-        tile.setAttribute("fill", `hsl(${i * 30}, 80%, 50%)`);
-        map.appendChild(tile);
-    }
-}
-
-// Add event listener for ball movement
-document.addEventListener("mousemove", (event) => {
-    const targetX = event.clientX + window.scrollX;
-    const targetY = event.clientY + window.scrollY;
-    world.ball.x = targetX;
-    world.ball.y = targetY;
-});
-
-// Update and render the game world
-function update() {
-    // Update ball position
-    world.ball.x += world.ball.velocityX;
-    world.ball.y += world.ball.velocityY;
-
-    // Boundary checking
-    if (world.ball.x + world.ball.radius > world.width) {
-        world.ball.x = world.width - world.ball.radius;
-        world.ball.velocityX = -world.ball.velocityX;
-    } else if (world.ball.x - world.ball.radius < 0) {
-        world.ball.x = world.ball.radius;
-        world.ball.velocityX = -world.ball.velocityX;
-    }
-    if (world.ball.y + world.ball.radius > world.height) {
-        world.ball.y = world.height - world.ball.radius;
-        world.ball.velocityY = -world.ball.velocityY;
-    } else if (world.ball.y - world.ball.radius < 0) {
-        world.ball.y = world.ball.radius;
-        world.ball.velocityY = -world.ball.velocityY;
+// Ball object
+class Ball {
+    constructor(x, y, radius, color) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.color = color;
+        this.velocity = {
+            x: 0,
+            y: 1
+        };
     }
 
-    // Update ball velocity
-    world.ball.velocityX += world.ball.accelerationX;
-    world.ball.velocityY += world.ball.accelerationY;
+    draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+        ctx.closePath();
+    }
 
-    // Render the game world
-    map.setAttribute("transform", `translate(${world.ball.x - world.width / 2}, ${world.ball.y - world.height / 2})`);
-}
+    update() {
+        this.draw();
+        this.velocity.y += gravity;
+        this.velocity.x *= friction;
+        this.x += this.velocity.x;
+        this.y += this.velocity.y;
 
-// Main game loop
-setInterval(update, 1000 / 60);
-
-// Handle ball collision with map tiles
-function checkCollision() {
-    for (let i = 0; i < world.tiles.length; i++) {
-        const tile = world.tiles[i];
-        const distance = Math.sqrt(Math.pow(world.ball.x - tile.x, 2) + Math.pow(world.ball.y - tile.y, 2));
-        if (distance < world.ball.radius + tile.radius) {
-            world.ball.velocityX = -world.ball.velocityX;
-            world.ball.velocityY = -world.ball.velocityY;
+        // Collision detection with the floor
+        if (this.y + this.radius + this.velocity.y >= canvas.height) {
+            this.velocity.y = -this.velocity.y * friction;
         }
     }
 }
 
-// Check for collisions every frame
-setInterval(checkCollision, 1000 / 60);
+// Obstacle class
+class Obstacle {
+    constructor(x, y, width, height, color) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.color = color;
+    }
+
+    draw() {
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
+
+    update() {
+        this.draw();
+        this.x -= gameSpeed;
+    }
+}
+
+// Handle key events
+window.addEventListener('keydown', function (e) {
+    switch (e.key) {
+        case 'ArrowRight':
+            keys.right = true;
+            break;
+        case 'ArrowLeft':
+            keys.left = true;
+            break;
+        case 'ArrowUp':
+            keys.up = true;
+            break;
+    }
+});
+
+window.addEventListener('keyup', function (e) {
+    switch (e.key) {
+        case 'ArrowRight':
+            keys.right = false;
+            break;
+        case 'ArrowLeft':
+            keys.left = false;
+            break;
+        case 'ArrowUp':
+            keys.up = false;
+            break;
+    }
+});
+
+// Game functions
+function spawnObstacles() {
+    const size = randomIntFromRange(20, 70);
+    const type = Math.random() > 0.5 ? 'top' : 'bottom';
+    const y = type === 'top' ? 0 : canvas.height - size;
+    obstacles.push(new Obstacle(canvas.width + size, y, size, size, 'red'));
+    if (obstacles.length > 20) {
+        obstacles.shift();
+    }
+}
+
+function randomIntFromRange(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+// Animation loop
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    obstacles.forEach(obstacle => obstacle.update());
+
+    // Ball controls
+    if (keys.right && ball.velocity.x < 5) {
+        ball.velocity.x++;
+    } else if (keys.left && ball.velocity.x > -5) {
+        ball.velocity.x--;
+    }
+
+    if (keys.up && ball.y > canvas.height * 0.1) {
+        ball.velocity.y -= 10;
+    }
+
+    ball.update();
+    animationFrameId = requestAnimationFrame(animate);
+
+    // Spawn new obstacles
+    if (animationFrameId % 60 === 0) {
+        spawnObstacles();
+    }
+}
+
+// Start the game
+const ball = new Ball(50, canvas.height / 2, 30, 'blue');
+animate();
