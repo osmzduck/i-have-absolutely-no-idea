@@ -1,71 +1,72 @@
+/* General Body Settings */
 body {
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    overflow: hidden;
-}
-
-#game-container {
-    width: 100%;
-    height: 100vh;
+    background: #1e1e1e; /* Dark background for contrast */
     display: flex;
     justify-content: center;
     align-items: center;
-    background-image: linear-gradient(to bottom, #333, #555);
-    background-size: 100% 300px;
-    background-position: 0% 100%;
-    transition: background-position 0.5s ease;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Arial', sans-serif;
 }
 
-.ball {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 30px;
-    height: 30px;
-    background-color: #fff;
-    border-radius: 50%;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    cursor: move;
-    transition: transform 0.2s ease;
+/* Game Container */
+#game-container {
+    width: 95vw;
+    height: 95vh;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.ball:hover {
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-    transform: scale(1.1);
+/* Canvas Styles */
+#gameCanvas {
+    background: radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%);
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+    display: block;
 }
 
-.map {
+/* Adding a subtle gradient overlay to enhance visuals */
+#game-container::before {
+    content: '';
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #333;
-    opacity: 0.5;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(145deg, rgba(255,255,255,0.1) 40%, rgba(0,0,0,0.3) 100%);
+    border-radius: 15px;
     pointer-events: none;
 }
 
-.path {
-    fill: none;
-    stroke: #fff;
-    stroke-width: 2px;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+/* Hover and Focus Effects */
+#game-container:hover {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
 }
 
-.path:hover {
-    stroke-dasharray: 100, 100;
-    animation: dash 0.5s ease;
+/* Responsive Adjustments */
+@media (max-width: 600px) {
+    #game-container {
+        width: 98vw;
+        height: 50vh;
+    }
+
+    body {
+        flex-direction: column;
+    }
 }
 
-@keyframes dash {
-    0% {
-        stroke-dasharray: 100, 100;
-    }
-    100% {
-        stroke-dasharray: 0, 0;
+@media (orientation: landscape) {
+    #game-container {
+        width: 90vw;
+        height: 80vh;
     }
 }
+
