@@ -4,7 +4,6 @@ const player = document.getElementById('player');
 const scoreValue = document.getElementById('score-value');
 const timerValue = document.getElementById('timer-value');
 const finalScore = document.getElementById('final-score');
-const startBtn = document.getElementById('start-btn');
 const restartBtn = document.getElementById('restart-btn');
 const menu = document.getElementById('menu');
 const gameOver = document.getElementById('game-over');
@@ -73,13 +72,7 @@ function init() {
     world.appendChild(goal);
 }
 
-// Start game
-function startGame() {
-    gameStarted = true;
-    menu.style.display = 'none';
-    init();
-    gameLoop = setInterval(updateGame, 1000 / 60);
-}
+
 
 // Update game
 function updateGame() {
@@ -192,8 +185,7 @@ function restartGame() {
 
 // Event listeners
 document.addEventListener('keydown', event => {
-    if (!gameStarted) return;
-
+return;
     switch (event.key) {
         case 'ArrowLeft':
             player.style.transform = `translate3d(${parseFloat(player.style.transform.match(/translate3d\((.+)px/)[1]) - playerSpeed}px, ${player.style.transform.match(/translate3d\(.+px, (.+)px/)[1]}, 15px)`;
@@ -209,6 +201,4 @@ document.addEventListener('keydown', event => {
             break;
     }
 });
-
-startBtn.addEventListener('click', startGame);
 restartBtn.addEventListener('click', restartGame);
