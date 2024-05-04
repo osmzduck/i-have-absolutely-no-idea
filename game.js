@@ -1,146 +1,230 @@
-// Canvas setup
-const canvas = document.getElementById('gameCanvas');
+const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+const levelInfo = document.getElementById('level-number');
+const scoreInfo = document.getElementById('score');
+const timerInfo = document.getElementById('timer');
+const levelCompleteModal = document.getElementById('level-complete-modal');
+const gameOverModal = document.getElementById('game-over-modal');
+const nextLevelBtn = document.getElementById('next-level-btn');
+const retryBtn = document.getElementById('retry-btn');
 
-// Game variables
-let animationFrameId;
-const gravity = 0.5;
-const friction = 0.98;
-let obstacles = [];
-let gameSpeed = 4;
-const keys = {
-    right: false,
-    left: false,
-    up: false
+let gameLoop;
+let currentLevel = 1;
+let score = 0;
+let timeRemaining = 60;
+let timerInterval;
+
+const ball = {
+    x: canvas.width / 2,
+    y: canvas.height / 2,
+    radius: 10,
+    speed: 5,
+    velocityX: 0,
+    velocityY: 0,
+    color: '#fff'
 };
 
-// Ball object
-class Ball {
-    constructor(x, y, radius, color) {
-        this.x = x;
-        this.y = y;
-        this.radius = radius;
-        this.color = color;
-        this.velocity = {
-            x: 0,
-            y: 1
-        };
+function drawBall() {
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+    ctx.fillStyle = ball.color;
+    ctx.fill();
+    ctx.closePath();
+}
+
+function moveBall() {
+    ball.x += ball.velocityX;
+    ball.y += ball.velocityY;
+}
+
+function handleBallCollision() {
+    // Ball collision with walls
+    if (ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) {
+        ball.velocityX = -ball.velocityX;
+    }
+    if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
+        ball.velocityY = -ball.velocityY;
     }
 
-    draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-        ctx.fillStyle = this.color;
-        ctx.fill();
-        ctx.closePath();
-    }
-
-    update() {
-        this.draw();
-        this.velocity.y += gravity;
-        this.velocity.x *= friction;
-        this.x += this.velocity.x;
-        this.y += this.velocity.y;
-
-        // Collision detection with the floor
-        if (this.y + this.radius + this.velocity.y >= canvas.height) {
-            this.velocity.y = -this.velocity.y * friction;
+    // Ball collision with obstacles
+    for (const obstacle of levels[currentLevel - 1].obstacles) {
+        if (
+            ball.x + ball.radius > obstacle.x &&
+            ball.x - ball.radius < obstacle.x + obstacle.width &&
+            ball.y + ball.radius > obstacle.y &&
+            ball.y - ball.radius < obstacle.y + obstacle.height
+        ) {
+            // Collision detected, handle accordingly (e.g., reverse velocity, decrease score)
+            ball.velocityX = -ball.velocityX;
+            ball.velocityY = -ball.velocityY;
+            score -= 10;
+            updateScore();
         }
     }
-}
 
-// Obstacle class
-class Obstacle {
-    constructor(x, y, width, height, color) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.color = color;
-    }
-
-    draw() {
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
-    }
-
-    update() {
-        this.draw();
-        this.x -= gameSpeed;
+    // Ball collision with goal
+    const goal = levels[currentLevel - 1].goal;
+    if (
+        ball.x + ball.radius > goal.x &&
+        ball.x - ball.radius < goal.x + goal.width &&
+        ball.y + ball.radius > goal.y &&
+        ball.y - ball.radius < goal.y + goal.height
+    ) {
+        // Level completed, show level complete modal
+        showLevelCompleteModal();
     }
 }
 
-// Handle key events
-window.addEventListener('keydown', function (e) {
-    switch (e.key) {
-        case 'ArrowRight':
-            keys.right = true;
-            break;
-        case 'ArrowLeft':
-            keys.left = true;
-            break;
-        case 'ArrowUp':
-            keys.up = true;
-            break;
-    }
-});
-
-window.addEventListener('keyup', function (e) {
-    switch (e.key) {
-        case 'ArrowRight':
-            keys.right = false;
-            break;
-        case 'ArrowLeft':
-            keys.left = false;
-            break;
-        case 'ArrowUp':
-            keys.up = false;
-            break;
-    }
-});
-
-// Game functions
-function spawnObstacles() {
-    const size = randomIntFromRange(20, 70);
-    const type = Math.random() > 0.5 ? 'top' : 'bottom';
-    const y = type === 'top' ? 0 : canvas.height - size;
-    obstacles.push(new Obstacle(canvas.width + size, y, size, size, 'red'));
-    if (obstacles.length > 20) {
-        obstacles.shift();
-    }
+function updateScore() {
+    scoreInfo.textContent = score;
 }
 
-function randomIntFromRange(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
+function updateTimer() {
+    const minutes = Math.floor(timeRemaining / 60);
+    const seconds = timeRemaining % 60;
+    timerInfo.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
-// Animation loop
-function animate() {
+function startTimer() {
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        updateTimer();
+
+        if (timeRemaining === 0) {
+            // Time's up, show game over modal
+            showGameOverModal();
+        }
+    }, 1000);
+}
+
+function resetTimer() {
+    clearInterval(timerInterval);
+    timeRemaining = 60;
+    updateTimer();
+}
+
+function showLevelCompleteModal() {
+    levelCompleteModal.style.display = 'block';
+    pauseGame();
+}
+
+function hideLevelCompleteModal() {
+    levelCompleteModal.style.display = 'none';
+}
+
+function showGameOverModal() {
+    gameOverModal.style.display = 'block';
+    pauseGame();
+}
+
+function hideGameOverModal() {
+    gameOverModal.style.display = 'none';
+}
+
+function loadLevel() {
+    levelInfo.textContent = currentLevel;
+    score = 0;
+    updateScore();
+    resetTimer();
+    ball.x = canvas.width / 2;
+    ball.y = canvas.height / 2;
+    ball.velocityX = 0;
+    ball.velocityY = 0;
+}
+
+function drawLevel() {
+    // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    obstacles.forEach(obstacle => obstacle.update());
 
-    // Ball controls
-    if (keys.right && ball.velocity.x < 5) {
-        ball.velocity.x++;
-    } else if (keys.left && ball.velocity.x > -5) {
-        ball.velocity.x--;
+    // Draw obstacles
+    for (const obstacle of levels[currentLevel - 1].obstacles) {
+        ctx.fillStyle = obstacle.color;
+        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
     }
 
-    if (keys.up && ball.y > canvas.height * 0.1) {
-        ball.velocity.y -= 10;
-    }
+    // Draw goal
+    const goal = levels[currentLevel - 1].goal;
+    ctx.fillStyle = goal.color;
+    ctx.fillRect(goal.x, goal.y, goal.width, goal.height);
 
-    ball.update();
-    animationFrameId = requestAnimationFrame(animate);
-
-    // Spawn new obstacles
-    if (animationFrameId % 60 === 0) {
-        spawnObstacles();
-    }
+    // Draw ball
+    drawBall();
 }
+
+function updateGame() {
+    moveBall();
+    handleBallCollision();
+    drawLevel();
+}
+
+function pauseGame() {
+    clearInterval(gameLoop);
+    clearInterval(timerInterval);
+}
+
+function startGame() {
+    loadLevel();
+    startTimer();
+    gameLoop = setInterval(updateGame, 1000 / 60);
+}
+
+function resetGame() {
+    currentLevel = 1;
+    score = 0;
+    loadLevel();
+    startTimer();
+    resumeGame();
+}
+
+function resumeGame() {
+    gameLoop = setInterval(updateGame, 1000 / 60);
+    startTimer();
+}
+
+function nextLevel() {
+    currentLevel++;
+    if (currentLevel > levels.length) {
+        // Game completed, show game complete message or restart from level 1
+        currentLevel = 1;
+    }
+    loadLevel();
+    hideLevelCompleteModal();
+    resumeGame();
+}
+
+// Event listeners
+document.addEventListener('keydown', (event) => {
+    switch (event.keyCode) {
+        case 37: // Left arrow
+            ball.velocityX = -ball.speed;
+            break;
+        case 38: // Up arrow
+            ball.velocityY = -ball.speed;
+            break;
+        case 39: // Right arrow
+            ball.velocityX = ball.speed;
+            break;
+        case 40: // Down arrow
+            ball.velocityY = ball.speed;
+            break;
+    }
+});
+
+document.addEventListener('keyup', (event) => {
+    switch (event.keyCode) {
+        case 37: // Left arrow
+        case 39: // Right arrow
+            ball.velocityX = 0;
+            break;
+        case 38: // Up arrow
+        case 40: // Down arrow
+            ball.velocityY = 0;
+            break;
+    }
+});
+
+nextLevelBtn.addEventListener('click', nextLevel);
+retryBtn.addEventListener('click', resetGame);
 
 // Start the game
-const ball = new Ball(50, canvas.height / 2, 30, 'blue');
-animate();
+startGame();
