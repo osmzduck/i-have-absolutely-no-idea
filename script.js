@@ -1,320 +1,245 @@
 // Game variables
-let canvas;
-let ctx;
-let ball;
+let gameWorld;
+let playerBall;
 let obstacles = [];
-let coins = [];
+let collectibles = [];
 let goal;
-let level = 1;
 let score = 0;
-let timeRemaining = 60;
-let gameInterval;
-let timerInterval;
+let level = 1;
+let timer = 0;
+let gameLoop;
 
-// Game constants
-const BALL_RADIUS = 10;
-const BALL_SPEED = 5;
-const OBSTACLE_SIZE = 30;
-const COIN_RADIUS = 5;
-const GOAL_SIZE = 50;
-const LEVEL_COMPLETE_BONUS = 100;
+// Screen elements
+let startScreen;
+let levelCompleteScreen;
+let gameOverScreen;
 
-// Game elements
-const gameMenu = document.getElementById('game-menu');
-const startButton = document.getElementById('start-button');
-const instructionsButton = document.getElementById('instructions-button');
-const instructionsModal = document.getElementById('instructions-modal');
-const closeInstructionsButton = document.getElementById('close-instructions');
-const levelInfo = document.getElementById('current-level');
-const timerDisplay = document.getElementById('time-remaining');
-const scoreDisplay = document.getElementById('current-score');
-const levelCompleteModal = document.getElementById('level-complete-modal');
-const nextLevelButton = document.getElementById('next-level-button');
-const gameOverModal = document.getElementById('game-over-modal');
-const finalScoreDisplay = document.getElementById('final-score');
-const restartButton = document.getElementById('restart-button');
+// Game initialization
+function initGame() {
+  gameWorld = document.getElementById('game-world');
+  playerBall = document.getElementById('player-ball');
+  goal = document.getElementById('goal');
+  startScreen = document.getElementById('start-screen');
+  levelCompleteScreen = document.getElementById('level-complete-screen');
+  gameOverScreen = document.getElementById('game-over-screen');
 
-// Initialize the game
-function init() {
-    canvas = document.getElementById('game-canvas');
-    ctx = canvas.getContext('2d');
+  // Event listeners
+  document.addEventListener('keydown', handleKeyDown);
+  document.addEventListener('keyup', handleKeyUp);
+  document.getElementById('start-button').addEventListener('click', startGame);
+  document.getElementById('next-level-button').addEventListener('click', nextLevel);
+  document.getElementById('restart-button').addEventListener('click', restartGame);
 
-    canvas.width = 800;
-    canvas.height = 600;
+  // Initialize game elements
+  initObstacles();
+  initCollectibles();
+  initPlayerBall();
+}
 
-    ball = {
-        x: canvas.width / 2,
-        y: canvas.height / 2,
-        radius: BALL_RADIUS,
-        speed: BALL_SPEED,
-        dx: 0,
-        dy: 0
-    };
+// Initialize obstacles
+function initObstacles() {
+  const obstacleCount = 5 + level * 2;
+  obstacles = [];
 
-    startButton.addEventListener('click', startGame);
-    instructionsButton.addEventListener('click', showInstructions);
-    closeInstructionsButton.addEventListener('click', closeInstructions);
-    nextLevelButton.addEventListener('click', nextLevel);
-    restartButton.addEventListener('click', restartGame);
+  for (let i = 0; i < obstacleCount; i++) {
+    const obstacle = document.createElement('div');
+    obstacle.classList.add('obstacle');
+    obstacle.style.width = `${getRandomNumber(50, 100)}px`;
+    obstacle.style.height = `${getRandomNumber(50, 100)}px`;
+    obstacle.style.top = `${getRandomNumber(0, gameWorld.clientHeight - 100)}px`;
+    obstacle.style.left = `${getRandomNumber(0, gameWorld.clientWidth - 100)}px`;
+    gameWorld.appendChild(obstacle);
+    obstacles.push(obstacle);
+  }
+}
 
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('keyup', handleKeyUp);
+// Initialize collectibles
+function initCollectibles() {
+  const collectibleCount = 3 + level;
+  collectibles = [];
+
+  for (let i = 0; i < collectibleCount; i++) {
+    const collectible = document.createElement('div');
+    collectible.classList.add('collectible');
+    collectible.style.top = `${getRandomNumber(0, gameWorld.clientHeight - 20)}px`;
+    collectible.style.left = `${getRandomNumber(0, gameWorld.clientWidth - 20)}px`;
+    gameWorld.appendChild(collectible);
+    collectibles.push(collectible);
+  }
+}
+
+// Initialize player ball
+function initPlayerBall() {
+  playerBall.style.top = '50%';
+  playerBall.style.left = '50px';
 }
 
 // Start the game
 function startGame() {
-    gameMenu.classList.add('hidden');
-    resetGame();
-    gameLoop();
-    startTimer();
+  startScreen.classList.remove('active');
+  startGameLoop();
 }
 
-// Reset the game
-function resetGame() {
-    level = 1;
-    score = 0;
-    timeRemaining = 60;
-    ball.x = canvas.width / 2;
-    ball.y = canvas.height / 2;
-    ball.dx = 0;
-    ball.dy = 0;
-    obstacles = [];
-    coins = [];
-    goal = null;
-    generateLevel();
+// Start the game loop
+function startGameLoop() {
+  gameLoop = setInterval(updateGame, 16);
 }
 
-// Generate a new level
-function generateLevel() {
-    levelInfo.textContent = level;
-
-    // Generate obstacles
-    for (let i = 0; i < level * 5; i++) {
-        const obstacle = {
-            x: Math.random() * (canvas.width - OBSTACLE_SIZE),
-            y: Math.random() * (canvas.height - OBSTACLE_SIZE),
-            width: OBSTACLE_SIZE,
-            height: OBSTACLE_SIZE
-        };
-        obstacles.push(obstacle);
-    }
-
-    // Generate coins
-    for (let i = 0; i < level * 3; i++) {
-        const coin = {
-            x: Math.random() * (canvas.width - COIN_RADIUS * 2) + COIN_RADIUS,
-            y: Math.random() * (canvas.height - COIN_RADIUS * 2) + COIN_RADIUS,
-            radius: COIN_RADIUS
-        };
-        coins.push(coin);
-    }
-
-    // Generate goal
-    goal = {
-        x: Math.random() * (canvas.width - GOAL_SIZE),
-        y: Math.random() * (canvas.height - GOAL_SIZE),
-        width: GOAL_SIZE,
-        height: GOAL_SIZE
-    };
+// Update the game state
+function updateGame() {
+  movePlayerBall();
+  checkCollisions();
+  updateTimer();
 }
 
-// Game loop
-function gameLoop() {
-    update();
-    render();
+// Move the player ball
+function movePlayerBall() {
+  const playerBallRect = playerBall.getBoundingClientRect();
 
-    gameInterval = requestAnimationFrame(gameLoop);
+  if (keys.ArrowUp && playerBallRect.top > 0) {
+    playerBall.style.top = `${playerBallRect.top - 5}px`;
+  }
+  if (keys.ArrowDown && playerBallRect.bottom < gameWorld.clientHeight) {
+    playerBall.style.top = `${playerBallRect.top + 5}px`;
+  }
+  if (keys.ArrowLeft && playerBallRect.left > 0) {
+    playerBall.style.left = `${playerBallRect.left - 5}px`;
+  }
+  if (keys.ArrowRight && playerBallRect.right < gameWorld.clientWidth) {
+    playerBall.style.left = `${playerBallRect.left + 5}px`;
+  }
 }
 
-// Update game state
-function update() {
-    // Move the ball
-    ball.x += ball.dx;
-    ball.y += ball.dy;
+// Check collisions
+function checkCollisions() {
+  const playerBallRect = playerBall.getBoundingClientRect();
 
-    // Check for collision with walls
-    if (ball.x < ball.radius || ball.x > canvas.width - ball.radius) {
-        ball.dx *= -1;
-    }
-    if (ball.y < ball.radius || ball.y > canvas.height - ball.radius) {
-        ball.dy *= -1;
-    }
-
-    // Check for collision with obstacles
-    for (let i = 0; i < obstacles.length; i++) {
-        const obstacle = obstacles[i];
-        if (
-            ball.x + ball.radius > obstacle.x &&
-            ball.x - ball.radius < obstacle.x + obstacle.width &&
-            ball.y + ball.radius > obstacle.y &&
-            ball.y - ball.radius < obstacle.y + obstacle.height
-        ) {
-            gameOver();
-            return;
-        }
-    }
-
-    // Check for collision with coins
-    for (let i = 0; i < coins.length; i++) {
-        const coin = coins[i];
-        if (
-            Math.sqrt(
-                (ball.x - coin.x) ** 2 + (ball.y - coin.y) ** 2
-            ) < ball.radius + coin.radius
-        ) {
-            coins.splice(i, 1);
-            score += 10;
-            scoreDisplay.textContent = score;
-        }
-    }
-
-    // Check for collision with goal
+  // Check collision with obstacles
+  for (let i = 0; i < obstacles.length; i++) {
+    const obstacleRect = obstacles[i].getBoundingClientRect();
     if (
-        ball.x + ball.radius > goal.x &&
-        ball.x - ball.radius < goal.x + goal.width &&
-        ball.y + ball.radius > goal.y &&
-        ball.y - ball.radius < goal.y + goal.height
+      playerBallRect.left < obstacleRect.right &&
+      playerBallRect.right > obstacleRect.left &&
+      playerBallRect.top < obstacleRect.bottom &&
+      playerBallRect.bottom > obstacleRect.top
     ) {
-        levelComplete();
+      gameOver();
+      return;
     }
-}
+  }
 
-// Render the game
-function render() {
-    // Clear the canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw the ball
-    ctx.beginPath();
-    ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-    ctx.fillStyle = '#ff0000';
-    ctx.fill();
-    ctx.closePath();
-
-    // Draw obstacles
-    ctx.fillStyle = '#0000ff';
-    for (let i = 0; i < obstacles.length; i++) {
-        const obstacle = obstacles[i];
-        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+  // Check collision with collectibles
+  for (let i = 0; i < collectibles.length; i++) {
+    const collectibleRect = collectibles[i].getBoundingClientRect();
+    if (
+      playerBallRect.left < collectibleRect.right &&
+      playerBallRect.right > collectibleRect.left &&
+      playerBallRect.top < collectibleRect.bottom &&
+      playerBallRect.bottom > collectibleRect.top
+    ) {
+      collectibles[i].remove();
+      collectibles.splice(i, 1);
+      score += 10;
+      updateScore();
     }
+  }
 
-    // Draw coins
-    ctx.fillStyle = '#ffff00';
-    for (let i = 0; i < coins.length; i++) {
-        const coin = coins[i];
-        ctx.beginPath();
-        ctx.arc(coin.x, coin.y, coin.radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.closePath();
-    }
-
-    // Draw goal
-    ctx.fillStyle = '#00ff00';
-    ctx.fillRect(goal.x, goal.y, goal.width, goal.height);
+  // Check collision with goal
+  const goalRect = goal.getBoundingClientRect();
+  if (
+    playerBallRect.left < goalRect.right &&
+    playerBallRect.right > goalRect.left &&
+    playerBallRect.top < goalRect.bottom &&
+    playerBallRect.bottom > goalRect.top
+  ) {
+    levelComplete();
+  }
 }
 
-// Handle key down event
-function handleKeyDown(event) {
-    switch (event.keyCode) {
-        case 37: // Left arrow
-        case 65: // A key
-            ball.dx = -ball.speed;
-            break;
-        case 38: // Up arrow
-        case 87: // W key
-            ball.dy = -ball.speed;
-            break;
-        case 39: // Right arrow
-        case 68: // D key
-            ball.dx = ball.speed;
-            break;
-        case 40: // Down arrow
-        case 83: // S key
-            ball.dy = ball.speed;
-            break;
-    }
+// Update the timer
+function updateTimer() {
+  timer++;
+  const minutes = Math.floor(timer / 3600);
+  const seconds = Math.floor((timer % 3600) / 60);
+  const milliseconds = timer % 60;
+  document.getElementById('timer-value').textContent = `${minutes}:${padZero(seconds)}:${padZero(milliseconds)}`;
 }
 
-// Handle key up event
-function handleKeyUp(event) {
-    switch (event.keyCode) {
-        case 37: // Left arrow
-        case 65: // A key
-        case 39: // Right arrow
-        case 68: // D key
-            ball.dx = 0;
-            break;
-        case 38: // Up arrow
-        case 87: // W key
-        case 40: // Down arrow
-        case 83: // S key
-            ball.dy = 0;
-            break;
-    }
-}
-
-// Show instructions modal
-function showInstructions() {
-    instructionsModal.classList.remove('hidden');
-}
-
-// Close instructions modal
-function closeInstructions() {
-    instructionsModal.classList.add('hidden');
-}
-
-// Start the timer
-function startTimer() {
-    timerInterval = setInterval(() => {
-        timeRemaining--;
-        timerDisplay.textContent = timeRemaining;
-
-        if (timeRemaining <= 0) {
-            gameOver();
-        }
-    }, 1000);
+// Update the score
+function updateScore() {
+  document.getElementById('score-value').textContent = score;
 }
 
 // Level complete
 function levelComplete() {
-    cancelAnimationFrame(gameInterval);
-    clearInterval(timerInterval);
-    score += LEVEL_COMPLETE_BONUS + timeRemaining;
-    scoreDisplay.textContent = score;
-    levelCompleteModal.classList.remove('hidden');
+  clearInterval(gameLoop);
+  levelCompleteScreen.classList.add('active');
+  document.getElementById('level-time').textContent = formatTime(timer);
+  level++;
+  document.getElementById('level-value').textContent = level;
 }
 
 // Next level
 function nextLevel() {
-    levelCompleteModal.classList.add('hidden');
-    level++;
-    timeRemaining = 60;
-    ball.x = canvas.width / 2;
-    ball.y = canvas.height / 2;
-    ball.dx = 0;
-    ball.dy = 0;
-    obstacles = [];
-    coins = [];
-    generateLevel();
-    gameLoop();
-    startTimer();
+  levelCompleteScreen.classList.remove('active');
+  resetGame();
+  startGame();
 }
 
 // Game over
 function gameOver() {
-    cancelAnimationFrame(gameInterval);
-    clearInterval(timerInterval);
-    finalScoreDisplay.textContent = score;
-    gameOverModal.classList.remove('hidden');
+  clearInterval(gameLoop);
+  gameOverScreen.classList.add('active');
+  document.getElementById('final-score').textContent = score;
 }
 
 // Restart the game
 function restartGame() {
-    gameOverModal.classList.add('hidden');
-    resetGame();
-    gameLoop();
-    startTimer();
+  gameOverScreen.classList.remove('active');
+  resetGame();
+  startScreen.classList.add('active');
 }
 
-// Start the game when the page loads
-window.addEventListener('load', init);
+// Reset the game state
+function resetGame() {
+  score = 0;
+  timer = 0;
+  updateScore();
+  updateTimer();
+  gameWorld.innerHTML = '';
+  gameWorld.appendChild(playerBall);
+  gameWorld.appendChild(goal);
+  initObstacles();
+  initCollectibles();
+  initPlayerBall();
+}
+
+// Keyboard event handlers
+let keys = {};
+
+function handleKeyDown(event) {
+  keys[event.code] = true;
+}
+
+function handleKeyUp(event) {
+  keys[event.code] = false;
+}
+
+// Utility functions
+function getRandomNumber(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function padZero(number) {
+  return number.toString().padStart(2, '0');
+}
+
+function formatTime(time) {
+  const minutes = Math.floor(time / 3600);
+  const seconds = Math.floor((time % 3600) / 60);
+  const milliseconds = time % 60;
+  return `${minutes}:${padZero(seconds)}:${padZero(milliseconds)}`;
+}
+
+// Initialize the game
+initGame();
