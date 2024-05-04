@@ -1,81 +1,142 @@
-body {
+* {
     margin: 0;
     padding: 0;
-    background-color: #111;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
 #game-container {
     position: relative;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    width: 800px;
+    height: 600px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    perspective: 800px;
 }
 
-#game-canvas {
-    border: 2px solid #fff;
-    background-color: #222;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+#world {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #e0e0e0;
+    transform-style: preserve-3d;
+    transform: rotateX(60deg) rotateZ(45deg);
 }
 
-#game-overlay {
+#player {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background-color: #ff5f5f;
+    border-radius: 50%;
+    transform: translateZ(15px);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease;
+}
+
+.obstacle {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background-color: #4c4c4c;
+    transform: translateZ(25px);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.collectible {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: #ffd700;
+    border-radius: 50%;
+    transform: translateZ(10px);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+    0% {
+        transform: translateZ(10px) rotateY(0deg);
+    }
+    100% {
+        transform: translateZ(10px) rotateY(360deg);
+    }
+}
+
+#goal {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background-color: #00ff00;
+    transform: translateZ(30px);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: translateZ(30px) scale(1);
+    }
+    50% {
+        transform: translateZ(30px) scale(1.2);
+    }
+    100% {
+        transform: translateZ(30px) scale(1);
+    }
+}
+
+#hud {
     position: absolute;
     top: 20px;
     left: 20px;
-    color: #fff;
     font-size: 18px;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    color: #333333;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
 }
 
-#level-info, #score-info, #timer-info {
-    margin-bottom: 10px;
-}
-
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 9999;
-    left: 0;
+#menu, #game-over {
+    position: absolute;
     top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
 }
 
-.modal-content {
-    background-color: #222;
-    color: #fff;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 300px;
-    text-align: center;
-    border-radius: 8px;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+h1, h2 {
+    font-size: 32px;
+    margin-bottom: 20px;
+    color: #333333;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-.modal-content h2 {
-    margin-top: 0;
-}
-
-.modal-content button {
-    background-color: #4CAF50;
-    color: #fff;
-    border: none;
+button {
     padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin-top: 20px;
+    font-size: 18px;
+    background-color: #ff5f5f;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
     cursor: pointer;
-    border-radius: 4px;
-    transition: background-color 0.3s;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
 }
 
-.modal-content button:hover {
-    background-color: #45a049;
+button:hover {
+    transform: scale(1.05);
 }
