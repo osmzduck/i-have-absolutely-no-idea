@@ -8,30 +8,35 @@
 </head>
 <body>
     <div id="game-container">
-        <canvas id="game-canvas"></canvas>
-        <div id="game-overlay">
-            <div id="level-info">Level: <span id="level-number">1</span></div>
-            <div id="score-info">Score: <span id="score">0</span></div>
-            <div id="timer-info">Time: <span id="timer">00:00</span></div>
+        <div id="world">
+            <div id="player"></div>
+            <div class="obstacle"></div>
+            <div class="obstacle"></div>
+            <div class="obstacle"></div>
+            <div class="obstacle"></div>
+            <div class="obstacle"></div>
+            <div class="collectible"></div>
+            <div class="collectible"></div>
+            <div class="collectible"></div>
+            <div id="goal"></div>
         </div>
-        <div id="level-complete-modal" class="modal">
-            <div class="modal-content">
-                <h2>Level Complete!</h2>
-                <p>Congratulations, you've completed the level.</p>
-                <button id="next-level-btn">Next Level</button>
-            </div>
-        </div>
-        <div id="game-over-modal" class="modal">
-            <div class="modal-content">
-                <h2>Game Over</h2>
-                <p>Oops, you ran out of time!</p>
-                <button id="retry-btn">Retry</button>
-            </div>
+        <div id="hud">
+            <div id="score">Score: <span id="score-value">0</span></div>
+            <div id="timer">Time: <span id="timer-value">0</span>s</div>
         </div>
     </div>
 
-    <script src="physics.js"></script>
-    <script src="levels.js"></script>
-    <script src="game.js"></script>
+    <div id="menu">
+        <h1>2D World Explorer</h1>
+        <button id="start-btn">Start Game</button>
+    </div>
+
+    <div id="game-over">
+        <h2>Game Over!</h2>
+        <p>Your Score: <span id="final-score"></span></p>
+        <button id="restart-btn">Restart</button>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
