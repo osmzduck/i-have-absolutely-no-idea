@@ -1,50 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2D World Explorer</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D World</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js"></script>
 </head>
 <body>
-  <div id="game-container">
-    <div id="game-world">
-      <div id="player-ball"></div>
-      <div class="obstacle"></div>
-      <div class="obstacle"></div>
-      <div class="obstacle"></div>
-      <div class="obstacle"></div>
-      <div class="obstacle"></div>
-      <div class="collectible"></div>
-      <div class="collectible"></div>
-      <div class="collectible"></div>
-      <div id="goal"></div>
-    </div>
-    <div id="game-overlay">
-      <div id="score">Score: <span id="score-value">0</span></div>
-      <div id="level">Level: <span id="level-value">1</span></div>
-      <div id="timer">Time: <span id="timer-value">0:00</span></div>
-    </div>
-  </div>
-
-  <div id="start-screen" class="screen">
-    <h1>2D World Explorer</h1>
-    <p>Navigate the 2D world using your ball and reach the goal!</p>
-    <button id="start-button">Start Game</button>
-  </div>
-
-  <div id="level-complete-screen" class="screen">
-    <h2>Level Complete!</h2>
-    <p>You completed the level in <span id="level-time"></span> seconds.</p>
-    <button id="next-level-button">Next Level</button>
-  </div>
-
-  <div id="game-over-screen" class="screen">
-    <h2>Game Over!</h2>
-    <p>Your final score: <span id="final-score"></span></p>
-    <button id="restart-button">Restart Game</button>
-  </div>
-
-  <script src="script.js"></script>
+    <div id="game-container"></div>
 </body>
 </html>
