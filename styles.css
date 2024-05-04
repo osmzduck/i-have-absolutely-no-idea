@@ -1,72 +1,81 @@
-/* General Body Settings */
 body {
     margin: 0;
     padding: 0;
-    background: #1e1e1e; /* Dark background for contrast */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    overflow: hidden;
-    font-family: 'Arial', sans-serif;
+    background-color: #111;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Game Container */
 #game-container {
-    width: 95vw;
-    height: 95vh;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 0 15px rgba(0,0,0,0.5);
     position: relative;
+    width: 100vw;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-/* Canvas Styles */
-#gameCanvas {
-    background: radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%);
+#game-canvas {
+    border: 2px solid #fff;
+    background-color: #222;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+#game-overlay {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: #fff;
+    font-size: 18px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+#level-info, #score-info, #timer-info {
+    margin-bottom: 10px;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
     width: 100%;
     height: 100%;
-    border-radius: 15px;
-    display: block;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6);
 }
 
-/* Adding a subtle gradient overlay to enhance visuals */
-#game-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(145deg, rgba(255,255,255,0.1) 40%, rgba(0,0,0,0.3) 100%);
-    border-radius: 15px;
-    pointer-events: none;
+.modal-content {
+    background-color: #222;
+    color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 300px;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
 }
 
-/* Hover and Focus Effects */
-#game-container:hover {
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+.modal-content h2 {
+    margin-top: 0;
 }
 
-/* Responsive Adjustments */
-@media (max-width: 600px) {
-    #game-container {
-        width: 98vw;
-        height: 50vh;
-    }
-
-    body {
-        flex-direction: column;
-    }
+.modal-content button {
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-top: 20px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s;
 }
 
-@media (orientation: landscape) {
-    #game-container {
-        width: 90vw;
-        height: 80vh;
-    }
+.modal-content button:hover {
+    background-color: #45a049;
 }
-
